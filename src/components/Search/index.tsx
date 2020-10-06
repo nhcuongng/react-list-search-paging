@@ -1,24 +1,25 @@
 import FlexSearch from 'flexsearch';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PickKeyWithType, TSearchRequired } from 'src/type'
 
 type TProp<T> = {
   list: T[];
-  onChange: (list: T[]) => void;
   field: PickKeyWithType<T, string> | string,
+  onChange: (results: T[]) => void,
 }
 
 export const Search = <T extends TSearchRequired>(props: TProp<T>) => {
   const [searchVal, setSearchVal] = useState('');
-  const { list, onChange, field = 'title'} = props;
-  let listSearched = list;
+  const { list, field = 'title', onChange } = props;
+  const [results, setResults] = useState(list);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchval = e.target.value;
     const flexSearch = FlexSearch.create({
       profile: 'speed',
       cache: true,
-      rtl: true,
-      tokenize: 'reverse', /** search tu phai qua trai */
+      // rtl: true,
+      // tokenize: 'reverse', /** search tu phai qua trai */
       doc: {
         id: 'id',
         field,
@@ -31,14 +32,24 @@ export const Search = <T extends TSearchRequired>(props: TProp<T>) => {
         field: [field as string],
       },
       (results: any) => {
-        listSearched = results.map(({ id } : { id: number }) => listSearched[id]);
-        onChange(listSearched);
+        const listSearched = results.map(({ id } : { id: number }) => list[id]);
+        setResults(listSearched);
       }
     )
     setSearchVal(e.target.value)
   };
 
+  useEffect(() => {
+    if (searchVal) {
+      onChange(results);
+      return;
+    }
+    onChange(list);
+  }, [searchVal]);
+
   return (
-    <input type='text' value={searchVal} onChange={handleSearch} />
+    <>
+      <input type='text' value={searchVal} onChange={handleSearch} />
+    </>
   )
 } 

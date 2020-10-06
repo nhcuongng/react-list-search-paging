@@ -14,7 +14,7 @@ export function makeId(length: number = 10) {
   return result;
 }
 
-type TList = {
+export type TList = {
   id: string,
   name: string,
   role: string,
