@@ -1,50 +1,29 @@
-/**
- * Tao ra id ngau nhien
- * @param length
- *
- * @src https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
- */
-export function makeId(length: number = 10) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i += 1) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
+export const orignalList: IItem[] = [
+  { _id: 1, title: 'Image 1', url: 'url1' },
+  { _id: 2, title: 'Image 2', url: 'url2' },
+  { _id: 3, title: 'Image 3', url: 'url3' },
+  { _id: 4, title: 'Image 4', url: 'url4' },
+  { _id: 5, title: 'Image 5', url: 'url5' },
+  { _id: 6, title: 'Image 6', url: 'url6' },
+  { _id: 7, title: 'Image 7', url: 'url7' },
+  { _id: 8, title: 'Image 8', url: 'url8' },
+  { _id: 9, title: 'Image 9', url: 'url9' },
+  { _id: 10, title: 'Image 10', url: 'url10' },
+  { _id: 11, title: 'Image 11', url: 'url11' },
+  { _id: 11, title: 'Image 12', url: 'url12' },
+  { _id: 11, title: 'Image 13', url: 'url13' },
+  { _id: 11, title: 'Image 14', url: 'url14' },
+  { _id: 11, title: 'Image 15', url: 'url15' },
+  { _id: 11, title: 'Image 17', url: 'url17' },
+  { _id: 11, title: 'Image 18', url: 'url18' },
+  { _id: 11, title: 'Image 19', url: 'url19' },
+  { _id: 11, title: 'Image 16', url: 'url16' },
+  { _id: 11, title: 'Image 16', url: 'url16' },
+  { _id: 11, title: 'Image 16', url: 'url16' },
+];
 
-export type TList = {
-  id: string,
-  name: string,
-  role: string,
+export interface IItem {
+  _id: number,
   title: string,
-}[]
-
-const MyStaff = ['Cường', 'Dũng', 'Hưng', 'Neo', 'Hùng', 'Tân', 'Đông', 'Hoan']
-
-export const genListFake = (function () {
-  const length = 100;
-  const temp: TList = []
-  for (let index = 0; index < (length / 2); index++) {
-    // const _tmp = `${MyStaff[Math.floor(Math.random() * MyStaff.length)]} ${index + 1}`
-    const _tmp = `Cuong ${index + 1}`
-    temp.push({
-      id: makeId(10),
-      title: _tmp,
-      name: _tmp,
-      role: 'Developer',
-    })
-  }
-  for (let index = 0; index < (length / 2); index++) {
-    // const _tmp = `${MyStaff[Math.floor(Math.random() * MyStaff.length)]} ${index + 1}`
-    const _tmp = `Neo ${index + 1}`
-    temp.push({
-      id: makeId(10),
-      title: _tmp,
-      name: _tmp,
-      role: 'Developer',
-    })
-  }
-  return temp;
-}());
+  url: string,
+}

@@ -1,64 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { makeId } from '../../data';
-import { Item } from './Item';
-import styles from './paging.module.scss'
+import React, { useEffect } from 'react';
+import { TSearchRequired } from 'src/type';
+import { Bar } from './Bar';
 
-type TProp = {
-  range: number,
-  list: number[],
-  onClick: (currPage: number) => void,
+interface IProps<T> {
+  items: T[];
+  onChange: (list: T[], currPage: number) => void,
+  perPage?: number;
+  rangePage?: number;
+  activePageProp?: number,
 }
 
-export const PagingBar: React.FC<TProp> = (props) => {
-  const { range, list, onClick } = props;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [arrRange, setArrRange] = useState(list.slice(0, range));
+export const PaginationBar = <T extends TSearchRequired>(props: IProps<T>) => {
+  const { items, perPage = 3, onChange, rangePage = 5, activePageProp } = props;
 
-  useEffect(
-    () => {
-      let tmp = [ ...arrRange ]
-      if (currentPage === arrRange[arrRange.length - 1] && currentPage !== list[list.length - 1]) {
-        tmp.shift();
-        tmp.push(list[currentPage])
-      } else if (currentPage === arrRange[0] && currentPage !== list[0]) {
-        tmp.pop()
-        tmp.unshift(list[currentPage - 2])
-      }
-      setArrRange(tmp);
-    },
-    [currentPage]
-  )
+  const genlist = (function () {
+    const temp: number[] = [];
+    console.log(items.length)
+    const totalPages = Math.ceil(items.length / perPage);
+    for (let index = 0; index < totalPages; index++) {
+      temp.push(index + 1)
+    }
+    return temp
+  }())
 
-  useEffect(
-    () => onClick(currentPage),
-    [currentPage]
-  )
-
-  const start = () => {
-    setArrRange(list.slice(0, range));
-    setCurrentPage(1);
+  
+  const setPagedList = (currPage: number) => {
+    const start = (currPage - 1) * perPage;
+    const end = currPage * perPage;
+    const _list = items.slice(start, end);
+    onChange(_list, currPage)
   }
 
-  const end = () => {
-    setArrRange(list.slice(Number(`-${range}`)));
-    setCurrentPage(list[list.length - 1])
-  }
-
+  useEffect(() => {
+    if (activePageProp) setPagedList(activePageProp);
+  }, [activePageProp]);
+  
   return (
-    <ul className={styles.pagingBar} key={makeId(10)}>
-      {arrRange[0] !== list[0] && arrRange[0] < list.length ? (
-        <Item content="<" onClick={start} />
-      ) : null}
-      {arrRange.map((page) => (
-        <Item
-          className={currentPage === page ? styles.active : ''}
-          content={String(page)} 
-          onClick={(_page) => setCurrentPage(Number(page))} 
-        />
-      ))}
-      {arrRange[arrRange.length - 1] < list[list.length - 1] ? (
-        <Item content=">" onClick={end} />
-      ) : null}
-    </ul>
-  )
-}
+      <Bar
+        range={rangePage}
+        list={genlist}
+        onClick={setPagedList}
+        activePageProp={activePageProp}
+      />
+  );
+};
