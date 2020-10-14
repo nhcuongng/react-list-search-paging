@@ -1,12 +1,12 @@
 import FlexSearch from 'flexsearch';
 import React, { useState } from 'react';
-import { PickKeyWithType, TSearchRequired } from 'src/type'
+import { PickKeyWithType, TSearchRequired } from 'src/type';
 
 type TProp<T> = {
   list: T[];
-  field: PickKeyWithType<T, string> | string,
-  onChange: (results: T[], searchVal: string) => void,
-}
+  field: PickKeyWithType<T, string> | string;
+  onChange: (results: T[], searchVal: string) => void;
+};
 
 export const Search = <T extends TSearchRequired>(props: TProp<T>) => {
   const [searchVal, setSearchVal] = useState('');
@@ -31,14 +31,14 @@ export const Search = <T extends TSearchRequired>(props: TProp<T>) => {
           field: [field as string],
         },
         (results: any) => {
-          const listSearched = results.map(({ id } : { id: number }) => list[id]);
+          const listSearched = results.map(({ id }: { id: number }) => list[id]);
           onChange(listSearched, searchVal);
-        }
-      )
+        },
+      );
       return;
     }
-    onChange(list, searchVal)
+    onChange(list, searchVal);
   };
 
-  return <input type='text' value={searchVal} onChange={handleSearch} />
-} 
+  return <input type='text' value={searchVal} onChange={handleSearch} />;
+};

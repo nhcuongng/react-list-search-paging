@@ -10,21 +10,21 @@ type TProps<T> = {
   /** component dùng để hiển thị một item trong list */
   child: TChildComponent<T>;
   /** list data truyền vào */
-  data: T[],
+  data: T[];
   /** ẩn thanh search */
-  hiddenSearch?: boolean,
+  hiddenSearch?: boolean;
   /** Nếu bật chức năng search thì nên điền field sẽ search theo, mặc định là search theo title */
-  field?: PickKeyWithType<T, string>,
+  field?: PickKeyWithType<T, string>;
   /** mỗi page có bao nhiêu item */
-  perPage?: number,
+  perPage?: number;
   /** Hiển thị số trang ở trên paging */
-  rangePage?: number,
+  rangePage?: number;
   /** class bao ngoài của list */
-  listClass?: string,
+  listClass?: string;
   /** class bao ngoài ô search */
-  wrapperSearchClass?: string,
+  wrapperSearchClass?: string;
   /** class bao ngoài paging bar */
-  paginationBarClass?: string,
+  paginationBarClass?: string;
 };
 
 /**
@@ -40,10 +40,15 @@ type TProps<T> = {
  */
 export const List = <T extends ItemInterface>(props: TProps<T>) => {
   const {
-    data, child,
-    perPage = ITEM_PER_PAGE, rangePage = RANGE_PAGE_SHOW, // paging
-    hiddenSearch, field = SEARCH_FOLLOW_FIELD as PickKeyWithType<T, string>, // search
-    listClass, paginationBarClass, wrapperSearchClass, // class
+    data,
+    child,
+    perPage = ITEM_PER_PAGE,
+    rangePage = RANGE_PAGE_SHOW, // paging
+    hiddenSearch,
+    field = SEARCH_FOLLOW_FIELD as PickKeyWithType<T, string>, // search
+    listClass,
+    paginationBarClass,
+    wrapperSearchClass, // class
   } = props;
 
   const [searchList, setSearchList] = useState<T[]>([]);
@@ -85,7 +90,7 @@ export const List = <T extends ItemInterface>(props: TProps<T>) => {
             items={list}
             onChange={(results, currPage) => {
               setPagedList(results);
-              console.log(currPage)
+              console.log(currPage);
               if (!isSearching) pageWhenNotSearch.current = currPage;
               else pageWhenSearch.current = currPage;
             }}
