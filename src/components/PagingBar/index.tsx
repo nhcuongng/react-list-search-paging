@@ -10,7 +10,21 @@ interface IProps<T> {
   activePageProp?: number;
 }
 
-export const PaginationBar = <T extends TSearchRequired>(props: IProps<T>) => {
+/**
+ * Component use to paging, return list after click per page
+ *
+ * @example
+ *
+ * ```ts
+ *   const [list, setList] = useState(originalList);
+ *
+ *   <PaginationBar
+ *     list={list}
+ *     onChange={setList}
+ *   />
+ * ```
+ */
+export const PaginationBar = <T extends TSearchRequired>(props: IProps<T>): JSX.Element => {
   const { items, perPage = 3, onChange, rangePage = 5, activePageProp } = props;
 
   const genlist = (function () {

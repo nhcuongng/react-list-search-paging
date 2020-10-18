@@ -7,28 +7,40 @@ import { PickKeyWithType, ItemInterface } from '../type';
 type TChildComponent<T> = (props: Pick<T, keyof T>, index: number) => JSX.Element | React.FC<T> | null;
 
 type TProps<T> = {
-  /** component dùng để hiển thị một item trong list */
+  /** Component use to display */
   child: TChildComponent<T>;
-  /** list data truyền vào */
+  /** original list */
   data: T[];
-  /** ẩn thanh search */
+  /** message show when search not found, pass as a ```component``` or ```string``` */
+  mgsSearchNotFound?: string | React.ReactNode;
+  /** Wrapper component will wrap your list */
+  wrapperComponent?: React.ReactElement<any>;
+  /** Hidden search bar */
   hiddenSearch?: boolean;
-  /** Nếu bật chức năng search thì nên điền field sẽ search theo, mặc định là search theo title */
+  /** if ```hiddenSearch = true```, you should fill this is string value (```type safed will your list```), default is ```title``` */
   field?: PickKeyWithType<T, string>;
-  /** mỗi page có bao nhiêu item */
+  /** number of items per page */
   perPage?: number;
-  /** Hiển thị số trang ở trên paging */
+  /** Range page in paging bar */
   rangePage?: number;
-  /** class bao ngoài của list */
+  /** Class wrap your list */
   listClass?: string;
-  /** class bao ngoài ô search */
+  /** Class wrap search input */
   wrapperSearchClass?: string;
-  /** class bao ngoài paging bar */
+  /** Class wrap paging bar */
   paginationBarClass?: string;
+  /** Event on searching */
+  onSearch?: (results: T[], searchVal: string) => void;
+  /** Event on click on paging bar  */
+  onPaging?: (results: T[], currPage: number) => void;
 };
 
 /**
- * List truyền vào yêu cầu có thuộc tính là ```title``` (vì sẽ mặc định search theo ```title```)
+ * Add paging and search for any list (```array object```)
+ * 
+ * If you just want searching (use component ```Search```)
+ * 
+ * If you  just want paging (use component ```PaginationBar```)
  *
  * @example
  * ```ts
@@ -38,7 +50,7 @@ type TProps<T> = {
     />
   ```
  */
-export const List = <T extends ItemInterface>(props: TProps<T>) => {
+export const List = <T extends ItemInterface>(props: TProps<T>): JSX.Element => {
   const {
     data,
     child,
@@ -49,6 +61,10 @@ export const List = <T extends ItemInterface>(props: TProps<T>) => {
     listClass,
     paginationBarClass,
     wrapperSearchClass, // class
+    wrapperComponent,
+    mgsSearchNotFound,
+    onSearch,
+    onPaging,
   } = props;
 
   const [searchList, setSearchList] = useState<T[]>([]);
@@ -59,13 +75,20 @@ export const List = <T extends ItemInterface>(props: TProps<T>) => {
   const pageWhenSearch = useRef(1);
 
   const list = searchList.length ? searchList : data;
+  const currentPage = isSearching ? pageWhenSearch.current : pageWhenNotSearch.current;
 
   useEffect(() => {
-    setPagedList(data.slice(0, perPage));
-  }, [data, perPage]);
+    setPagedList(data.slice((currentPage - 1) * perPage, currentPage * perPage));
+  }, [data, perPage, currentPage]);
 
-  const items = listClass ? <div className={listClass}>{pagedList.map(child)}</div> : pagedList.map(child);
-  const currentPage = isSearching ? pageWhenSearch.current : pageWhenNotSearch.current;
+  const listDisplay = () => {
+    const items = listClass ? <div className={listClass}>{pagedList.map(child)}</div> : pagedList.map(child);
+    let listComponents = pagedList.length ? items : <div>{mgsSearchNotFound}</div>;
+    if (wrapperComponent) {
+      listComponents = React.cloneElement(wrapperComponent, { children: listComponents });
+    }
+    return listComponents;
+  };
 
   return (
     <>
@@ -79,20 +102,21 @@ export const List = <T extends ItemInterface>(props: TProps<T>) => {
               setPagedList(results.slice((currentPage - 1) * perPage, currentPage * perPage));
               setSearchList(results);
               setIsSearching(!!searchVal);
+              onSearch && onSearch(results, searchVal);
             }}
           />
         </div>
       ) : null}
-      {pagedList.length ? items : <>Not found any results</>}
+      {listDisplay()}
       {isSearching && searchList.length === 0 ? null : (
         <div className={paginationBarClass || ''}>
           <PaginationBar
             items={list}
             onChange={(results, currPage) => {
               setPagedList(results);
-              console.log(currPage);
               if (!isSearching) pageWhenNotSearch.current = currPage;
               else pageWhenSearch.current = currPage;
+              onPaging && onPaging(results, currPage);
             }}
             perPage={perPage}
             rangePage={rangePage}

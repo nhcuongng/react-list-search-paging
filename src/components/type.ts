@@ -15,7 +15,9 @@
 export type PickKeyWithType<Base, Condition> = FilterFlagsKey<Base, Condition>[keyof Base];
 
 type FilterFlagsKey<Base, Condition> = {
-  [Key in keyof Base]: Base[Key] extends Condition ? Key : never
+  [Key in keyof Base]: Base[Key] extends Condition ? Key : never;
 };
 
-export interface ItemInterface { title: string }
+export interface ItemInterface {
+  title: string;
+}

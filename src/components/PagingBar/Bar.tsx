@@ -46,8 +46,9 @@ export const Bar: React.FC<TProp> = props => {
   return (
     <ul className={styles.pagingBar}>
       {arrRange[0] !== list[0] && arrRange[0] < list.length ? <Item content='<' onClick={start} /> : null}
-      {arrRange.map(page => (
+      {arrRange.map((page, index) => (
         <Item
+          key={index}
           className={currentPage === page ? styles.active : ''}
           content={String(page)}
           onClick={_page => setCurrentPage(Number(page))}
