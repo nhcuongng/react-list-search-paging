@@ -1,39 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PaginationBar } from '../PagingBar';
+import { PaginationBar } from '../PagingnationBar';
 import { Search } from '../Search';
-import { ITEM_PER_PAGE, RANGE_PAGE_SHOW, SEARCH_FOLLOW_FIELD } from '../config';
-import { PickKeyWithType, ItemInterface } from '../type';
-
-type TChildComponent<T> = (props: Pick<T, keyof T>, index: number) => JSX.Element | React.FC<T> | null;
-
-type TProps<T> = {
-  /** Component use to display */
-  child: TChildComponent<T>;
-  /** original list */
-  data: T[];
-  /** message show when search not found, pass as a ```component``` or ```string``` */
-  mgsSearchNotFound?: string | React.ReactNode;
-  /** Wrapper component will wrap your list */
-  wrapperComponent?: React.ReactElement<any>;
-  /** Hidden search bar */
-  hiddenSearch?: boolean;
-  /** if ```hiddenSearch = true```, you should fill this is string value (```type safed will your list```), default is ```title``` */
-  field?: PickKeyWithType<T, string>;
-  /** number of items per page */
-  perPage?: number;
-  /** Range page in paging bar */
-  rangePage?: number;
-  /** Class wrap your list */
-  listClass?: string;
-  /** Class wrap search input */
-  wrapperSearchClass?: string;
-  /** Class wrap paging bar */
-  paginationBarClass?: string;
-  /** Event on searching */
-  onSearch?: (results: T[], searchVal: string) => void;
-  /** Event on click on paging bar  */
-  onPaging?: (results: T[], currPage: number) => void;
-};
+import { ITEM_PER_PAGE, RANGE_PAGE_SHOW, SEARCH_FOLLOW_FIELD, SEARCH_PLACE_HOLDER } from '../config';
+import { TAnyObject, PickKeyWithType } from '../type';
+import { ListProps } from './type';
 
 /**
  * Add paging and search for any list (```array object```)
@@ -50,21 +20,22 @@ type TProps<T> = {
     />
   ```
  */
-export const List = <T extends ItemInterface>(props: TProps<T>): JSX.Element => {
+export const List = <T extends TAnyObject>(props: ListProps<T>): JSX.Element => {
   const {
-    data,
+    items,
     child,
     perPage = ITEM_PER_PAGE,
-    rangePage = RANGE_PAGE_SHOW, // paging
+    rangePage = RANGE_PAGE_SHOW,
     hiddenSearch,
-    field = SEARCH_FOLLOW_FIELD as PickKeyWithType<T, string>, // search
+    field = SEARCH_FOLLOW_FIELD as PickKeyWithType<T, string>,
     listClass,
     paginationBarClass,
-    wrapperSearchClass, // class
+    wrapperSearchClass,
     wrapperComponent,
     mgsSearchNotFound,
     onSearch,
     onPaging,
+    searchPlaceholder = SEARCH_PLACE_HOLDER,
   } = props;
 
   const [searchList, setSearchList] = useState<T[]>([]);
@@ -74,19 +45,17 @@ export const List = <T extends ItemInterface>(props: TProps<T>): JSX.Element => 
   const pageWhenNotSearch = useRef(1);
   const pageWhenSearch = useRef(1);
 
-  const list = searchList.length ? searchList : data;
+  const list = searchList.length ? searchList : items;
   const currentPage = isSearching ? pageWhenSearch.current : pageWhenNotSearch.current;
 
   useEffect(() => {
-    setPagedList(data.slice((currentPage - 1) * perPage, currentPage * perPage));
-  }, [data, perPage, currentPage]);
+    !isSearching && setPagedList(items.slice((currentPage - 1) * perPage, currentPage * perPage));
+  }, [items, perPage, currentPage]);
 
   const listDisplay = () => {
     const items = listClass ? <div className={listClass}>{pagedList.map(child)}</div> : pagedList.map(child);
     let listComponents = pagedList.length ? items : <div>{mgsSearchNotFound}</div>;
-    if (wrapperComponent) {
-      listComponents = React.cloneElement(wrapperComponent, { children: listComponents });
-    }
+    if (wrapperComponent) listComponents = wrapperComponent(listComponents);
     return listComponents;
   };
 
@@ -95,8 +64,9 @@ export const List = <T extends ItemInterface>(props: TProps<T>): JSX.Element => 
       {!hiddenSearch ? (
         <div className={wrapperSearchClass}>
           <Search
-            list={data}
+            items={items}
             field={field}
+            searchPlaceholder={searchPlaceholder}
             onChange={(results, searchVal) => {
               if (searchVal) pageWhenSearch.current = 1;
               setPagedList(results.slice((currentPage - 1) * perPage, currentPage * perPage));
@@ -126,11 +96,4 @@ export const List = <T extends ItemInterface>(props: TProps<T>): JSX.Element => 
       )}
     </>
   );
-};
-
-List.defaultProps = {
-  rangePage: RANGE_PAGE_SHOW,
-  field: SEARCH_FOLLOW_FIELD,
-  perPage: ITEM_PER_PAGE,
-  hiddenSearch: false,
 };

@@ -1,12 +1,7 @@
 import FlexSearch from 'flexsearch';
 import React, { useState, useEffect } from 'react';
-import { PickKeyWithType, TSearchRequired } from 'src/type';
-
-type TProp<T> = {
-  list: T[];
-  field: PickKeyWithType<T, string> | string;
-  onChange: (results: T[], searchVal: string) => void;
-};
+import { TAnyObject } from '../type';
+import { SearchProp } from './type';
 
 /**
  * Componet use to search, return result after searched
@@ -17,20 +12,20 @@ type TProp<T> = {
  * const [list, setList] = useState(originalList);
  *
  * <Search
- *  list={list}
+ *  items={list}
  *  onChange={setList}
  * />
  * ```
  */
-export const Search = <T extends TSearchRequired>(props: TProp<T>): JSX.Element => {
+export const Search = <T extends TAnyObject>(props: SearchProp<T>): JSX.Element => {
   const [searchVal, setSearchVal] = useState('');
-  const { list, field = 'title', onChange } = props;
+  const { items, field = 'title', onChange, searchPlaceholder } = props;
 
   const handleSearch = (searchVal: string) => {
     setSearchVal(searchVal);
 
     if (!searchVal) {
-      onChange(list, searchVal);
+      onChange(items, searchVal);
       return;
     }
 
@@ -42,14 +37,14 @@ export const Search = <T extends TSearchRequired>(props: TProp<T>): JSX.Element 
         field,
       },
     });
-    flexSearch.add(list.map(({ [field]: fieldName }, index) => ({ id: index, [field]: fieldName })));
+    flexSearch.add(items.map(({ [field]: fieldName }, index) => ({ id: index, [field]: fieldName })));
     flexSearch.search(
       {
         query: searchVal,
         field: [field as string],
       },
       (results: any) => {
-        const listSearched = results.map(({ id }: { id: number }) => list[id]);
+        const listSearched = results.map(({ id }: { id: number }) => items[id]);
         onChange(listSearched, searchVal);
         return;
       },
@@ -57,8 +52,8 @@ export const Search = <T extends TSearchRequired>(props: TProp<T>): JSX.Element 
   };
 
   useEffect(() => {
-    handleSearch(searchVal);
-  }, [list, searchVal]);
+    searchVal && handleSearch(searchVal);
+  }, [items, searchVal]);
 
-  return <input type='text' value={searchVal} onChange={e => handleSearch(e.target.value)} />;
+  return <input placeholder={searchPlaceholder} type='text' value={searchVal} onChange={e => handleSearch(e.target.value)} />;
 };

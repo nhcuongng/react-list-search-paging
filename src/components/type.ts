@@ -18,6 +18,4 @@ type FilterFlagsKey<Base, Condition> = {
   [Key in keyof Base]: Base[Key] extends Condition ? Key : never;
 };
 
-export interface ItemInterface {
-  title: string;
-}
+export type TAnyObject = Record<string, unknown>[0];

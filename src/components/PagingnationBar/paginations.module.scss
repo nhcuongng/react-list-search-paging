@@ -1,0 +1,39 @@
+.wrapperPagination {
+  margin-left: 0;
+}
+.pagination {
+  display: inline-block;
+  padding-left: calc(50% - 150px);
+  margin: 20px 0;
+
+  svg {
+    fill: #666;
+  }
+
+  li {
+    display: inline;
+
+    a {
+      position: relative;
+      float: left;
+      padding: 6px 12px;
+      margin-left: -1px;
+      line-height: 1.42857143;
+      color: #337ab7;
+      text-decoration: none;
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+  }
+
+  .active {
+    a,
+    span {
+      z-index: 3;
+      color: #fff;
+      cursor: default;
+      background-color: #337ab7;
+      border-color: #337ab7;
+    }
+  }
+}
