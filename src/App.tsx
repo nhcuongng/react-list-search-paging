@@ -20,20 +20,27 @@ interface IComment {
 }
 
 export const App: React.FC = () => {
-  const [list, setList] = useState<(IComment & { title: string })[]>([]);
+  const [list, setList] = useState<IComment[]>([]);
 
   useEffect(() => {
     axios.get<IComment[]>('https://jsonplaceholder.typicode.com/posts').then(res => setList(res.data));
   }, []);
 
   const handleAdd = () => {
-    axios
-      .post<IComment[]>('https://jsonplaceholder.typicode.com/posts', {
+    setList(
+      list.concat({
         title: 'foo',
         body: 'bar',
-        userId: 1,
-      })
-      .then(res => setList(list.concat(res.data)));
+        id: 1000,
+      }),
+    );
+    // axios
+    //   .post<IComment[]>('https://jsonplaceholder.typicode.com/posts', {
+    //     title: 'foo',
+    //     body: 'bar',
+    //     userId: 1,
+    //   })
+    //   .then(res => setList(list.concat(res.data)));
   };
 
   return (
